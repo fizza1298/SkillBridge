@@ -58,18 +58,26 @@ function Chat() {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [listening, setListening] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const askAI = async (q) => {
-    const prompt = q || question;
-    const response = await fetch("https://skillbridge-d7z9.onrender.com/api/ask/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question: prompt }),
-    });
-    const data = await response.json();
-    const reply = data.answer || data.error || "No response";
-    setAnswer(reply);
-    speak(reply);
+    setLoading(true);
+    try {
+      const prompt = q || question;
+      const response = await fetch("https://skillbridge-d7z9.onrender.com/api/ask/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: prompt }),
+      });
+      const data = await response.json();
+      const reply = data.answer || data.error || "No response";
+      setAnswer(reply);
+      speak(reply);
+    } catch (err) {
+      console.error("❌ Failed to fetch AI response:", err);
+      setAnswer("Something went wrong while fetching from AI.");
+    }
+    setLoading(false);
   };
 
   const speak = (text) => {
@@ -105,9 +113,18 @@ function Chat() {
         onChange={(e) => setQuestion(e.target.value)}
       />
       <div style={{ marginTop: "1rem" }}>
-        <button onClick={() => askAI()} style={bigBtnStyle}>
-          💬 Ask AI
+        <button
+          onClick={() => askAI()}
+          disabled={loading}
+          style={{
+            ...bigBtnStyle,
+            opacity: loading ? 0.6 : 1,
+            cursor: loading ? "not-allowed" : "pointer",
+          }}
+        >
+          {loading ? "🤔 Thinking..." : "💬 Ask AI"}
         </button>
+
         <button onClick={toggleListening} style={bigOutlineBtnStyle}>
           {listening ? "🎙️ Listening..." : "🎤 Talk to AI"}
         </button>
