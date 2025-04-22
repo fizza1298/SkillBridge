@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-@ov^#@%1&nq&ba%6y_1e_4&ny^80x9qe!k=3p@o6l2$8^b9@#a
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['skillbridge-d7z9.onrender.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -126,4 +126,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "https://skill-bridge-lake.vercel.app",
+] 
