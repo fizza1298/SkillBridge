@@ -1,4 +1,5 @@
 import os
+import traceback
 import requests
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -12,7 +13,6 @@ def ask_ai(request):
     question = request.data.get('question', '')
     if not question:
         return Response({'error': 'No question provided'}, status=400)
-
     try:
         print("🔑 Using API Key:", GEMINI_API_KEY)  # TEMPORARY DEBUG LINE
         print("❓ Question received:", question)  # TEMPORARY DEBUG LINE
@@ -33,6 +33,7 @@ def ask_ai(request):
         ai_reply = result.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "")
 
         return Response({'answer': ai_reply})
-
     except Exception as e:
+        print("⚠️ Exception:", str(e))
+        traceback.print_exc()
         return Response({'error': str(e)}, status=500)
