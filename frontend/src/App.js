@@ -193,9 +193,27 @@ function Chat() {
 
   const speak = (text) => {
     const u = new SpeechSynthesisUtterance(text);
+    const voices = speechSynthesis.getVoices();
+  
+    // Try to find the most natural voice
+    const preferredVoice = voices.find(v =>
+      v.name === "Daniel" ||
+      v.name === "Samantha" ||
+      v.name === "Karen"
+    );
+  
+    if (preferredVoice) {
+      u.voice = preferredVoice;
+    }
+  
+    u.pitch = 1;     // Normal tone
+    u.rate = 0.8;    // Slightly slower = clearer
+    u.volume = 1.1;    // Full volume
+  
     speechSynthesis.speak(u);
     setUtterance(u);
   };
+  
 
   const stopSpeaking = () => {
     speechSynthesis.cancel();
