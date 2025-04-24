@@ -36,15 +36,15 @@ export default function Chat() {
       const response = await fetch("https://skillbridge-d7z9.onrender.com/api/ask/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: prompt })
-      });
+        body: JSON.stringify({ question: prompt, mode: role ? "feedback" : "explain" })
+      });      
       const data = await response.json();
       const reply = data.answer || data.error || "No response";
       setAnswer(reply);
       speak(reply);
 
       if (role) {
-        const cleanPrompt = prompt.toLowerCase();
+        const cleanPrompt = reply.toLowerCase();
         if (cleanPrompt.includes("help") || cleanPrompt.includes("find")) {
           setFeedback("✅ Excellent job! You showed empathy and willingness to assist. Next time, you could also ask a follow-up question like ‘Can you describe the item?’");
         } else {
