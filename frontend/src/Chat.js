@@ -33,30 +33,32 @@ export default function Chat() {
   const askAI = async (prompt) => {
     setLoading(true);
   
-    // Dynamically determine the mode
     const selectedMode = mode === "roleplay" && role ? "feedback" : "explain";
     console.log("🧠 Selected Mode:", selectedMode);
+  
+    // 🔁 Use your environment variable or hardcode it if needed
+    const BASE_URL = process.env.REACT_APP_API_BASE || "https://skillbridge-d7z9.onrender.com";
+  
+    // 🎯 Use two endpoints
+    const endpoint = `${BASE_URL}/api/${selectedMode}/`;
+  
     try {
-      const response = await fetch("https://skillbridge-d7z9.onrender.com/api/ask/", {
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          question: prompt,
-          mode: selectedMode
-        })
+        body: JSON.stringify({ question: prompt })
       });
   
       const data = await response.json();
       const reply = data.answer || data.error || "No response";
   
       if (selectedMode === "feedback") {
-        setFeedback(reply);  // For roleplay
+        setFeedback(reply);
       } else {
-        setAnswer(reply);    // For ask mode
+        setAnswer(reply);
       }
   
       speak(reply);
-  
     } catch (err) {
       console.error("❌ Fetch error:", err);
       setAnswer("Something went wrong while fetching from AI.");
@@ -64,6 +66,41 @@ export default function Chat() {
   
     setLoading(false);
   };
+  
+//   const askAI = async (prompt) => {
+//     setLoading(true);
+  
+//     // Dynamically determine the mode
+//     const selectedMode = mode === "roleplay" && role ? "feedback" : "explain";
+//     console.log("🧠 Selected Mode:", selectedMode);
+//     try {
+//       const response = await fetch("https://skillbridge-d7z9.onrender.com/api/ask/", {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({
+//           question: prompt,
+//           mode: selectedMode
+//         })
+//       });
+  
+//       const data = await response.json();
+//       const reply = data.answer || data.error || "No response";
+  
+//       if (selectedMode === "feedback") {
+//         setFeedback(reply);  // For roleplay
+//       } else {
+//         setAnswer(reply);    // For ask mode
+//       }
+  
+//       speak(reply);
+  
+//     } catch (err) {
+//       console.error("❌ Fetch error:", err);
+//       setAnswer("Something went wrong while fetching from AI.");
+//     }
+  
+//     setLoading(false);
+//   };
   
   
 

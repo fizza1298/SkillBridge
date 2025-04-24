@@ -127,6 +127,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOWED_ORIGINS = [
+     "http://localhost:3000",
     "https://skill-bridge-eight.vercel.app",
     "https://skill-bridge-b0zb2gb6i-fizza1298s-projects.vercel.app",  # New preview URL
     "https://skill-bridge-b0zb2gb6i-fizza1298s-projects.vercel.app",
