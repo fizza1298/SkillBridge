@@ -32,34 +32,39 @@ export default function Chat() {
 
   const askAI = async (prompt) => {
     setLoading(true);
+  
+    // Dynamically determine the mode
+    const selectedMode = mode === "roleplay" && role ? "feedback" : "explain";
+    console.log("🧠 Selected Mode:", selectedMode);
     try {
       const response = await fetch("https://skillbridge-d7z9.onrender.com/api/ask/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            question: prompt,
-           mode: "feedback"
-          })
-          
+          question: prompt,
+          mode: selectedMode
+        })
       });
   
       const data = await response.json();
       const reply = data.answer || data.error || "No response";
   
-      if (role) {
-        setFeedback(reply);  // AI is giving feedback
-        speak(reply);
+      if (selectedMode === "feedback") {
+        setFeedback(reply);  // For roleplay
       } else {
-        setAnswer(reply);    // AI is explaining something
-        speak(reply);
+        setAnswer(reply);    // For ask mode
       }
+  
+      speak(reply);
   
     } catch (err) {
       console.error("❌ Fetch error:", err);
       setAnswer("Something went wrong while fetching from AI.");
     }
+  
     setLoading(false);
   };
+  
   
 
   const toggleListening = () => {
@@ -83,21 +88,21 @@ export default function Chat() {
     recognition.start();
   };
 
-  const handleRoleplay = (selectedRole) => {
-    setRole(selectedRole);
-    if (selectedRole === "customer") {
-      const prompt = "Hi, I’m looking for something specific. Can you help me find it?";
-      setAnswer(prompt);
-      speak(prompt);
-      toggleListening();
-    } else if (selectedRole === "boss") {
-      const prompt = "Tell me about your performance this week.";
-      setAnswer(prompt);
-      speak(prompt);
-      toggleListening();
-    }
-  };
 
+  const handleRoleplay = (selectedRole) => {
+    setMode("roleplay"); // <-- this is key to make sure selectedMode becomes "feedback"
+    setRole(selectedRole);
+  
+    const prompt =
+      selectedRole === "customer"
+        ? "Hi, I’m looking for something specific. Can you help me find it?"
+        : "Tell me about your performance this week.";
+  
+    setAnswer(prompt);
+    speak(prompt);
+    setTimeout(() => toggleListening(), 100);
+  };
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex flex-col items-center justify-center text-center p-10 animate-fade-in">
       <div className="w-full max-w-3xl">

@@ -22,7 +22,7 @@ def ask_ai(request):
         if mode == "feedback":
             prompt_text = f"You're a communication coach. Give clear, positive, constructive feedback on the following customer service message: \"{text}\""
         else:
-            prompt_text = f"Explain this simply to someone with a learning disability , clear and simple with emojis and no markdown: {text}"
+            prompt_text = f"Explain this simply like im 10 years old so that if i have a learning disability i can understand it: {text}"
 
         data = {
             "contents": [{
