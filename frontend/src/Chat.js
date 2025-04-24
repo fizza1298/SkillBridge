@@ -8,6 +8,7 @@ export default function Chat() {
   const [loading, setLoading] = useState(false);
   const [utterance, setUtterance] = useState(null);
   const [mode, setMode] = useState("chat");
+  console.log("Current mode:", mode);
   const [role, setRole] = useState("interviewer");
   const [history, setHistory] = useState([]);
 
@@ -59,23 +60,53 @@ export default function Chat() {
     setLoading(false);
   };
 
-  const toggleListening = () => {
+//   const toggleListening = () => {
+//     if (!('webkitSpeechRecognition' in window)) {
+//       alert("Your browser doesn't support voice recognition.");
+//       return;
+//     }
+//     const recognition = new window.webkitSpeechRecognition();
+//     recognition.lang = 'en-US';
+//     recognition.onresult = (event) => {
+//       const transcript = event.results[0][0].transcript;
+//       setQuestion(transcript);
+//       askAI(transcript);
+//     };
+//     recognition.onend = () => setListening(false);
+//     recognition.start();
+//     setListening(true);
+//   };
+const toggleListening = () => {
     if (!('webkitSpeechRecognition' in window)) {
       alert("Your browser doesn't support voice recognition.");
       return;
     }
+  
     const recognition = new window.webkitSpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
     recognition.lang = 'en-US';
+  
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
       setQuestion(transcript);
       askAI(transcript);
     };
-    recognition.onend = () => setListening(false);
-    recognition.start();
+  
+    recognition.onerror = (e) => {
+      console.error("Speech recognition error:", e);
+      setListening(false);
+    };
+  
+    recognition.onend = () => {
+      setListening(false);
+    };
+  
     setListening(true);
+    recognition.start();
+    console.log("🛑 Stopped listening");
   };
-
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex flex-col items-center justify-center text-center p-6 animate-fade-in">
       <div className="w-full max-w-2xl">
