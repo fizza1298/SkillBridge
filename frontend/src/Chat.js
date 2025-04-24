@@ -45,9 +45,12 @@ export default function Chat() {
     try {
       const response = await fetch(endpoint, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: prompt })
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ question: prompt })  // ✅ Make sure this is valid JSON
       });
+      
   
       const data = await response.json();
       const reply = data.answer || data.error || "No response";
