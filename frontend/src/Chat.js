@@ -37,28 +37,26 @@ export default function Chat() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: prompt, mode: role ? "feedback" : "explain" })
-      });      
+      });
+  
       const data = await response.json();
       const reply = data.answer || data.error || "No response";
-      setAnswer(reply);
-      speak(reply);
-
+  
       if (role) {
-        const cleanPrompt = reply.toLowerCase();
-        if (cleanPrompt.includes("help") || cleanPrompt.includes("find")) {
-          setFeedback("✅ Excellent job! You showed empathy and willingness to assist. Next time, you could also ask a follow-up question like ‘Can you describe the item?’");
-        } else {
-          setFeedback("👍 Good response! Try to show more warmth or ask a clarifying question to go further.");
-        }
+        setFeedback(reply);  // AI is giving feedback
+        speak(reply);
       } else {
-        setFeedback("");
+        setAnswer(reply);    // AI is explaining something
+        speak(reply);
       }
+  
     } catch (err) {
       console.error("❌ Fetch error:", err);
       setAnswer("Something went wrong while fetching from AI.");
     }
     setLoading(false);
   };
+  
 
   const toggleListening = () => {
     if (!('webkitSpeechRecognition' in window)) {
