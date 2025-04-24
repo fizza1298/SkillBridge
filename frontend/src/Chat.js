@@ -36,7 +36,11 @@ export default function Chat() {
       const response = await fetch("https://skillbridge-d7z9.onrender.com/api/ask/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: prompt, mode: role ? "feedback" : "explain" })
+        body: JSON.stringify({
+            question: prompt,
+           mode: "feedback"
+          })
+          
       });
   
       const data = await response.json();
