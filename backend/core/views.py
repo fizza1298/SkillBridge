@@ -23,10 +23,13 @@ def run_gemini_prompt(request, mode):
         return Response({'error': 'No question provided'}, status=400)
 
     prompt_text = (
-        f"Give feedback on like im 10: \"{text}\""
-        if mode == 'feedback'
-        else f"Explain this simply like I'm 10 years old: {text}"
-    )
+    f"Give feedback in one very short, simple sentence. Only use small, clear words. Do not mention the person's age. Imagine you're just replying kindly and briefly to a work message: \"{text}\""
+    if mode == 'feedback'
+    else f"Explain this clearly using one or two short sentences. No big words. Do not mention the person or their age. Just make it clear and simple like you're helping someone who finds things hard to read: \"{text}\""
+)
+
+
+
 
     try:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"

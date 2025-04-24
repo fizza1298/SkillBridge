@@ -201,7 +201,7 @@ export default function Chat() {
 
         {answer && (
           <div className="bg-gray-100 p-6 mt-6 rounded shadow text-left text-xl">
-            <strong className="block mb-3">AI:</strong>
+            <strong className="block mb-3">Customer:</strong>
             <p className="whitespace-pre-wrap leading-relaxed text-gray-800">{answer}</p>
           </div>
         )}
