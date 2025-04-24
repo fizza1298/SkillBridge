@@ -23,7 +23,7 @@ def run_gemini_prompt(request, mode):
         return Response({'error': 'No question provided'}, status=400)
 
     prompt_text = (
-    f"Give feedback in one very short, simple sentence. Only use small, clear words. Do not mention the person's age. Imagine you're just replying kindly and briefly to a work message: \"{text}\""
+    f"Give feedback in 1 or 2 simple sentences. Only use small, clear words. Do not mention the person's age. Imagine you're just replying kindly and briefly to a work message, ackowdge what they did rigth and how they can improve: \"{text}\""
     if mode == 'feedback'
     else f"Explain this clearly using one or two short sentences. No big words. Do not mention the person or their age. Just make it clear and simple like you're helping someone who finds things hard to read: \"{text}\""
 )
