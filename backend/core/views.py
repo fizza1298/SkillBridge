@@ -23,7 +23,7 @@ def run_gemini_prompt(request, mode):
         return Response({'error': 'No question provided'}, status=400)
 
     prompt_text = (
-        f"You're a communication coach. Give feedback on: \"{text}\""
+        f"Give feedback on like im 10: \"{text}\""
         if mode == 'feedback'
         else f"Explain this simply like I'm 10 years old: {text}"
     )

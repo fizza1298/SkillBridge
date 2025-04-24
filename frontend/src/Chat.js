@@ -127,10 +127,15 @@ export default function Chat() {
     setListening(true);
     recognition.start();
   };
-
-
+  useEffect(() => {
+    if (mode === "roleplay" && role && answer) {
+      // Wait until mode, role, and answer are all set
+      toggleListening(); // which calls askAI() with the transcript
+    }
+  }, [mode, role, answer]);
+  
   const handleRoleplay = (selectedRole) => {
-    setMode("roleplay"); // <-- this is key to make sure selectedMode becomes "feedback"
+    setMode("roleplay");
     setRole(selectedRole);
   
     const prompt =
@@ -140,8 +145,22 @@ export default function Chat() {
   
     setAnswer(prompt);
     speak(prompt);
-    setTimeout(() => toggleListening(), 100);
+    setQuestion(""); // Clear old question if needed
   };
+  
+//   const handleRoleplay = (selectedRole) => {
+//     setMode("roleplay"); // <-- this is key to make sure selectedMode becomes "feedback"
+//     setRole(selectedRole);
+  
+//     const prompt =
+//       selectedRole === "customer"
+//         ? "Hi, I’m looking for something specific. Can you help me find it?"
+//         : "Tell me about your performance this week.";
+  
+//     setAnswer(prompt);
+//     speak(prompt);
+//     setTimeout(() => toggleListening(), 100);
+//   };
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex flex-col items-center justify-center text-center p-10 animate-fade-in">
