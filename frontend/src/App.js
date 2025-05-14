@@ -1,5 +1,5 @@
-// App.js
 import React, { useEffect, useState } from "react";
+import { getUserId, getUserName, setUserName } from "./userId";
 import {
   BrowserRouter as Router,
   Routes,
@@ -85,7 +85,7 @@ function FloatingEmojis() {
   );
 }
 
-function Home() {
+function Home( {userName} ) {
   const navigate = useNavigate();
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-blue-50 to-white flex flex-col items-center justify-center text-center p-6 animate-fade-in">
@@ -93,6 +93,9 @@ function Home() {
       <h1 className="text-5xl font-extrabold text-blue-800 mb-4">
         Welcome to <span className="text-blue-500">SkillBridge</span>
       </h1>
+      {userName && (
+        <p className="text-2xl text-blue-700 mb-4">Hello, {userName}!</p>
+        )}
       <p className="text-xl text-gray-700 max-w-xl mb-8">
         Empowering inclusive skill-building — one step at a time.
       </p>
@@ -115,10 +118,26 @@ function Home() {
 }
 
 export default function App() {
+  const [userName, setUserNameState] = useState(getUserName());
+
+  useEffect(() => {
+    getUserId(); // Ensure user ID exists
+    if (!userName) {
+      // Prompt for name if not set
+      let name = "";
+      while (!name) {
+        name = window.prompt("Welcome! What's your name?");
+        if (name) {
+          setUserName(name);
+          setUserNameState(name);
+        }
+      }
+    }
+  }, []);
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Home userName={userName} />} />
         <Route path="/chat" element={<Chat />} />
         <Route path="/lessons" element={<Lessons />} />
         <Route path="/lessons/roster" element={<RosterLesson />} />
