@@ -4,6 +4,7 @@ import requests
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from dotenv import load_dotenv
+import re
 
 load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
@@ -41,7 +42,12 @@ def run_gemini_prompt(request, mode):
         response = requests.post(url, headers=headers, json=data)
         result = response.json()
         ai_reply = result.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "")
-        return Response({'answer': ai_reply})
+        clean_reply = strip_markdown(ai_reply)
+        return Response({'answer': clean_reply})
 
     except Exception as e:
         return Response({'error': str(e)}, status=500)
+
+def strip_markdown(text):
+    # Remove **bold**, *italics*, `code`, bullet points, etc.
+    return re.sub(r'[*_`>#-]', '', text)
