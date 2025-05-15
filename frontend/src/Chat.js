@@ -54,7 +54,8 @@ export default function Chat() {
       
   
       const data = await response.json();
-      const reply = data.answer || data.error || "No response";
+      let reply = data.answer || data.error || "No response";
+      reply = reply.replace(/[*_`>#-]/g, '');
   
       if (selectedMode === "feedback") {
         setFeedback(reply);
@@ -212,11 +213,17 @@ export default function Chat() {
             </>
           )}
   
-          {feedback && (
-            <div className="mt-6 bg-green-100 text-green-900 p-4 text-lg rounded shadow">
-              {feedback}
-            </div>
-          )}
+            {loading && (
+              <div className="mt-6 text-gray-600 text-lg italic animate-pulse">
+                Thinking...
+              </div>
+            )}
+
+            {feedback && !loading && (
+              <div className="mt-6 bg-green-100 text-green-900 p-4 text-lg rounded shadow">
+                {feedback}
+              </div>
+            )}
         </div>
       </div>
     </div>
