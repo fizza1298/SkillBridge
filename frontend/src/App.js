@@ -9,6 +9,8 @@ import {
 import Chat from "./Chat";
 import RosterLesson from "./Roster_Lesson";
 import RosterQuestions from "./RosterQuestions";
+import Email from "./Email";
+import EmailQuiz from "./EmailQuiz";
 
 function Lessons() {
   const navigate = useNavigate();
@@ -153,6 +155,8 @@ export default function App() {
         <Route path="/lessons" element={<Lessons />} />
         <Route path="/lessons/roster" element={<RosterLesson />} />
         <Route path="/lessons/roster-questions" element={<RosterQuestions />} />
+        <Route path="/lessons/email" element={<Email />} />
+        <Route path="/lessons/email-quiz" element={<EmailQuiz />} />
       </Routes>
     </Router>
   );
