@@ -22,7 +22,7 @@ function Lessons() {
     {
       title: "Writing an Email",
       emoji: "✉️",
-      onClick: () => alert("Lesson coming soon!"),
+      onClick: () => navigate("/lessons/email"),
     },
     {
       title: "Asking for Help",
@@ -34,6 +34,7 @@ function Lessons() {
   return (
     <div className="min-h-screen p-8 bg-gradient-to-br from-white to-blue-50">
       <h2 className="text-3xl font-bold text-blue-800 mb-6 text-center">Lessons</h2>
+  
       <div className="flex flex-col gap-4 items-center">
         {lessons.map((lesson, index) => (
           <button
@@ -45,6 +46,16 @@ function Lessons() {
             {lesson.title}
           </button>
         ))}
+      </div>
+  
+      {/* Back to Home button */}
+      <div className="flex justify-center mt-10">
+        <button
+          onClick={() => navigate("/")}
+          className="px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-xl shadow transition duration-200"
+        >
+          🔙 Back to Home
+        </button>
       </div>
     </div>
   );
