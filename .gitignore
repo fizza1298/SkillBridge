@@ -11,3 +11,5 @@ __pycache__/
 *.pyc
 
 backend/backend/creds/google-tts.json
+backend/db.sqlite3
+
