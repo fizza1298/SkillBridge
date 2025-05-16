@@ -4,6 +4,7 @@ import requests
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from dotenv import load_dotenv
+from .models import QuizResult
 import re
 
 load_dotenv()
@@ -16,6 +17,25 @@ def explain_mode(request):
 @api_view(['POST'])
 def feedback_mode(request):
     return run_gemini_prompt(request, mode='feedback')
+
+@api_view(["GET", "POST"])
+def quiz_result(request, quiz_key):
+    user_id = request.headers.get("X-User-Id") or request.data.get("user_id")
+    if request.method == "POST":
+        answers = request.data.get("answers", [])
+        if not isinstance(answers, list):
+            return Response({"error": "Answers must be a list"}, status=400)
+        obj, _ = QuizResult.objects.update_or_create(
+            user_id=user_id, quiz_key=quiz_key,
+            defaults={"answers": answers}
+        )
+        return Response({"status": "saved"})
+    else:  # GET
+        try:
+            obj = QuizResult.objects.get(user_id=user_id, quiz_key=quiz_key)
+            return Response({"answers": obj.answers})
+        except QuizResult.DoesNotExist:
+            return Response({"answers": [None, None, None]})
 
 def run_gemini_prompt(request, mode):
     text = request.data.get('question', '')
