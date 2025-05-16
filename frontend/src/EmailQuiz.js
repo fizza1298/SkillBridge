@@ -1,9 +1,32 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { getUserId } from "./userId";
+
+async function saveQuizAnswers(quizKey, answers) {
+  const userId = getUserId();
+  await fetch(`/api/quiz/${quizKey}/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-User-Id": userId,
+    },
+    body: JSON.stringify({ answers }),
+  });
+}
+
+async function loadQuizAnswers(quizKey) {
+  const userId = getUserId();
+  const res = await fetch(`/api/quiz/${quizKey}/`, {
+    headers: { "X-User-Id": userId },
+  });
+  const data = await res.json();
+  return data.answers || {};
+}
 
 
 export default function EmailQuiz() {
  const navigate = useNavigate();
+ const quizKey = "email_quiz";
 
 
  const questions = [
@@ -42,7 +65,20 @@ export default function EmailQuiz() {
 
  const [userAnswers, setUserAnswers] = useState(Array(questions.length).fill(null));
  const [showResults, setShowResults] = useState(false);
+ 
+// Load answers from backend when component mounts
+  useEffect(() => {
+    loadQuizAnswers(quizKey).then((saved) => {
+      if (saved && Array.isArray(saved) && saved.length === questions.length) {
+        setUserAnswers(saved);
+      }
+    });
+    // eslint-disable-next-line
+  }, []);
 
+  
+
+  
 
  const handleSelect = (qIndex, optionIndex) => {
    const updatedAnswers = [...userAnswers];
@@ -52,9 +88,9 @@ export default function EmailQuiz() {
 
 
  const handleSubmit = () => {
-   setShowResults(true);
- };
-
+  saveQuizAnswers(quizKey, userAnswers);
+  setShowResults(true);
+};
 
  const getScore = () => {
    return userAnswers.reduce((score, answer, index) => {
