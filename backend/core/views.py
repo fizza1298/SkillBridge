@@ -62,47 +62,104 @@ def speak(request):
     if not text:
         return Response({'error': 'No text provided'}, status=400)
 
-    # Path to your JSON key
-    # credentials = service_account.Credentials.from_service_account_file(
-    #     # os.path.join('backend', 'creds', 'google-tts.json'),
-    #     "/etc/secrets/google-tts.json"
-    #     scopes=["https://www.googleapis.com/auth/cloud-platform"]
-    # )
-    credentials = service_account.Credentials.from_service_account_file(
-    "/etc/secrets/google-tts.json",
-    scopes=["https://www.googleapis.com/auth/cloud-platform"]
-)
+    try:
+        # 🔍 Log access
+        print("🔊 Starting TTS request...")
 
-    credentials.refresh(GoogleRequest())
+        credentials = service_account.Credentials.from_service_account_file(
+            "/etc/secrets/google-tts.json",
+            scopes=["https://www.googleapis.com/auth/cloud-platform"]
+        )
+        credentials.refresh(GoogleRequest())
 
-    headers = {
-        "Authorization": f"Bearer {credentials.token}",
-        "Content-Type": "application/json"
-    }
+        print("✅ Credentials loaded and refreshed.")
 
-    payload = {
-        "input": {
-            "text": text
-        },
-        "voice": {
-            "languageCode": "en-AU",
-            "name": "en-AU-Chirp3-HD-Despina"  # The expressive voice you picked
-        },
-        "audioConfig": {
-            "audioEncoding": "MP3"
+        headers = {
+            "Authorization": f"Bearer {credentials.token}",
+            "Content-Type": "application/json"
         }
-    }
 
-    response = requests.post(
-        "https://texttospeech.googleapis.com/v1/text:synthesize",
-        headers=headers,
-        json=payload
-    )
+        payload = {
+            "input": {
+                "text": text
+            },
+            "voice": {
+                "languageCode": "en-AU",
+                "name": "en-AU-Chirp3-HD-Despina"
+            },
+            "audioConfig": {
+                "audioEncoding": "MP3"
+            }
+        }
 
-    result = response.json()
+        response = requests.post(
+            "https://texttospeech.googleapis.com/v1/text:synthesize",
+            headers=headers,
+            json=payload
+        )
 
-    if "audioContent" not in result:
-        return Response({'error': 'Text-to-Speech API failed', 'details': result}, status=500)
+        print("📡 Google TTS response status:", response.status_code)
 
-    audio_data = base64.b64decode(result["audioContent"])
-    return Response(audio_data, content_type="audio/mpeg")
+        result = response.json()
+        if "audioContent" not in result:
+            print("❌ Failed response:", result)
+            return Response({'error': 'Text-to-Speech API failed', 'details': result}, status=500)
+
+        audio_data = base64.b64decode(result["audioContent"])
+        return Response(audio_data, content_type="audio/mpeg")
+
+    except Exception as e:
+        print("❗ Exception in speak():", e)
+        print(traceback.format_exc())
+        return Response({'error': str(e)}, status=500)
+
+# @api_view(['POST'])
+# def speak(request):
+#     text = request.data.get('text', '')
+#     if not text:
+#         return Response({'error': 'No text provided'}, status=400)
+
+#     # Path to your JSON key
+#     # credentials = service_account.Credentials.from_service_account_file(
+#     #     # os.path.join('backend', 'creds', 'google-tts.json'),
+#     #     "/etc/secrets/google-tts.json"
+#     #     scopes=["https://www.googleapis.com/auth/cloud-platform"]
+#     # )
+#     credentials = service_account.Credentials.from_service_account_file(
+#     "/etc/secrets/google-tts.json",
+#     scopes=["https://www.googleapis.com/auth/cloud-platform"]
+# )
+
+#     credentials.refresh(GoogleRequest())
+
+#     headers = {
+#         "Authorization": f"Bearer {credentials.token}",
+#         "Content-Type": "application/json"
+#     }
+
+#     payload = {
+#         "input": {
+#             "text": text
+#         },
+#         "voice": {
+#             "languageCode": "en-AU",
+#             "name": "en-AU-Chirp3-HD-Despina"  # The expressive voice you picked
+#         },
+#         "audioConfig": {
+#             "audioEncoding": "MP3"
+#         }
+#     }
+
+#     response = requests.post(
+#         "https://texttospeech.googleapis.com/v1/text:synthesize",
+#         headers=headers,
+#         json=payload
+#     )
+
+#     result = response.json()
+
+#     if "audioContent" not in result:
+#         return Response({'error': 'Text-to-Speech API failed', 'details': result}, status=500)
+
+#     audio_data = base64.b64decode(result["audioContent"])
+#     return Response(audio_data, content_type="audio/mpeg")
