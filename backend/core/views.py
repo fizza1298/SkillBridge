@@ -9,6 +9,7 @@ from google.oauth2 import service_account
 import base64
 import re
 import json
+from django.http import HttpResponse
 
 load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
@@ -65,9 +66,15 @@ def speak(request):
     try:
         # 🔍 Log access
         print("🔊 Starting TTS request...")
+        creds_path = (
+            "/etc/secrets/google-tts.json"
+            if os.getenv("RENDER") == "true"
+            else "backend/creds/google-tts.json"
+        )
+
 
         credentials = service_account.Credentials.from_service_account_file(
-            "/etc/secrets/google-tts.json",
+            creds_path,
             scopes=["https://www.googleapis.com/auth/cloud-platform"]
         )
         credentials.refresh(GoogleRequest())
@@ -106,60 +113,11 @@ def speak(request):
             return Response({'error': 'Text-to-Speech API failed', 'details': result}, status=500)
 
         audio_data = base64.b64decode(result["audioContent"])
-        return Response(audio_data, content_type="audio/mpeg")
+        return HttpResponse(audio_data, content_type="audio/mpeg")
 
     except Exception as e:
         print("❗ Exception in speak():", e)
         print(traceback.format_exc())
         return Response({'error': str(e)}, status=500)
 
-# @api_view(['POST'])
-# def speak(request):
-#     text = request.data.get('text', '')
-#     if not text:
-#         return Response({'error': 'No text provided'}, status=400)
 
-#     # Path to your JSON key
-#     # credentials = service_account.Credentials.from_service_account_file(
-#     #     # os.path.join('backend', 'creds', 'google-tts.json'),
-#     #     "/etc/secrets/google-tts.json"
-#     #     scopes=["https://www.googleapis.com/auth/cloud-platform"]
-#     # )
-#     credentials = service_account.Credentials.from_service_account_file(
-#     "/etc/secrets/google-tts.json",
-#     scopes=["https://www.googleapis.com/auth/cloud-platform"]
-# )
-
-#     credentials.refresh(GoogleRequest())
-
-#     headers = {
-#         "Authorization": f"Bearer {credentials.token}",
-#         "Content-Type": "application/json"
-#     }
-
-#     payload = {
-#         "input": {
-#             "text": text
-#         },
-#         "voice": {
-#             "languageCode": "en-AU",
-#             "name": "en-AU-Chirp3-HD-Despina"  # The expressive voice you picked
-#         },
-#         "audioConfig": {
-#             "audioEncoding": "MP3"
-#         }
-#     }
-
-#     response = requests.post(
-#         "https://texttospeech.googleapis.com/v1/text:synthesize",
-#         headers=headers,
-#         json=payload
-#     )
-
-#     result = response.json()
-
-#     if "audioContent" not in result:
-#         return Response({'error': 'Text-to-Speech API failed', 'details': result}, status=500)
-
-#     audio_data = base64.b64decode(result["audioContent"])
-#     return Response(audio_data, content_type="audio/mpeg")
