@@ -11,6 +11,7 @@ import RosterLesson from "./Roster_Lesson";
 import RosterQuestions from "./RosterQuestions";
 import Email from "./Email";
 import EmailQuiz from "./EmailQuiz";
+import AskForHelp from "./AskForHelp";
 
 function Lessons() {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ function Lessons() {
     {
       title: "Asking for Help",
       emoji: "🙋",
-      onClick: () => alert("Lesson coming soon!"),
+      onClick: () => navigate("/lessons/ask-for-help"),
     },
   ];
 
@@ -157,6 +158,7 @@ export default function App() {
         <Route path="/lessons/roster-questions" element={<RosterQuestions />} />
         <Route path="/lessons/email" element={<Email />} />
         <Route path="/lessons/email-quiz" element={<EmailQuiz />} />
+        <Route path="/lessons/ask-for-help" element={<AskForHelp />} />
       </Routes>
     </Router>
   );
