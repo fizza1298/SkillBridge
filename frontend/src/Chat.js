@@ -138,7 +138,7 @@ export default function Chat() {
         : "Tell me about your performance this week.";
   
     setAnswer(prompt);
-    speak(prompt);
+    playVoice(prompt);
     setQuestion(""); // Clear old question if needed
   };
   return (
