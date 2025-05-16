@@ -5,6 +5,12 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from dotenv import load_dotenv
 import re
+from google.auth.transport.requests import Request as GoogleRequest
+from google.oauth2 import service_account
+import base64
+import re
+import json
+from django.http import HttpResponse
 
 load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
@@ -51,3 +57,68 @@ def run_gemini_prompt(request, mode):
 def strip_markdown(text):
     # Remove **bold**, *italics*, `code`, bullet points, etc.
     return re.sub(r'[*_`>#-]', '', text)
+
+@api_view(['POST'])
+def speak(request):
+    text = request.data.get('text', '')
+    if not text:
+        return Response({'error': 'No text provided'}, status=400)
+
+    try:
+        # 🔍 Log access
+        print("🔊 Starting TTS request...")
+        creds_path = (
+            "/etc/secrets/google-tts.json"
+            if os.getenv("RENDER") == "true"
+            else "backend/creds/google-tts.json"
+        )
+
+
+        credentials = service_account.Credentials.from_service_account_file(
+            creds_path,
+            scopes=["https://www.googleapis.com/auth/cloud-platform"]
+        )
+        credentials.refresh(GoogleRequest())
+
+        print("✅ Credentials loaded and refreshed.")
+
+        headers = {
+            "Authorization": f"Bearer {credentials.token}",
+            "Content-Type": "application/json"
+        }
+
+        payload = {
+            "input": {
+                "text": text
+            },
+            "voice": {
+                "languageCode": "en-AU",
+                "name": "en-AU-Chirp3-HD-Despina"
+            },
+            "audioConfig": {
+                "audioEncoding": "MP3"
+            }
+        }
+
+        response = requests.post(
+            "https://texttospeech.googleapis.com/v1/text:synthesize",
+            headers=headers,
+            json=payload
+        )
+
+        print("📡 Google TTS response status:", response.status_code)
+
+        result = response.json()
+        if "audioContent" not in result:
+            print("❌ Failed response:", result)
+            return Response({'error': 'Text-to-Speech API failed', 'details': result}, status=500)
+
+        audio_data = base64.b64decode(result["audioContent"])
+        return HttpResponse(audio_data, content_type="audio/mpeg")
+
+    except Exception as e:
+        print("❗ Exception in speak():", e)
+        print(traceback.format_exc())
+        return Response({'error': str(e)}, status=500)
+
+
