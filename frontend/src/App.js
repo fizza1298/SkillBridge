@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getUserId, getUserName, setUserName } from "./userId";
+import { getUserId, getUserName, setUserName as saveUserName } from "./userId";
 import {
   BrowserRouter as Router,
   Routes,
@@ -12,6 +12,41 @@ import RosterQuestions from "./RosterQuestions";
 import Email from "./Email";
 import EmailQuiz from "./EmailQuiz";
 import AskForHelp from "./AskForHelp";
+
+// Modal component for name input
+function NameModal({ open, onSubmit }) {
+  const [name, setName] = useState("");
+
+  useEffect(() => {
+    if (open) setName("");
+  }, [open]);
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+      <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-sm text-center">
+        <h2 className="text-2xl font-bold mb-4 text-blue-800">Welcome!</h2>
+        <p className="mb-4 text-gray-700">Please enter your name to get started:</p>
+        <input
+          className="border rounded px-4 py-2 w-full mb-4"
+          type="text"
+          value={name}
+          onChange={e => setName(e.target.value)}
+          autoFocus
+        />
+        <button
+          className="px-6 py-2 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition"
+          onClick={() => {
+            if (name.trim()) onSubmit(name.trim());
+          }}
+        >
+          Submit
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function Lessons() {
   const navigate = useNavigate();
@@ -37,7 +72,6 @@ function Lessons() {
   return (
     <div className="min-h-screen p-8 bg-gradient-to-br from-white to-blue-50">
       <h2 className="text-3xl font-bold text-blue-800 mb-6 text-center">Lessons</h2>
-  
       <div className="flex flex-col gap-4 items-center">
         {lessons.map((lesson, index) => (
           <button
@@ -50,7 +84,6 @@ function Lessons() {
           </button>
         ))}
       </div>
-  
       {/* Back to Home button */}
       <div className="flex justify-center mt-10">
         <button
@@ -99,7 +132,7 @@ function FloatingEmojis() {
   );
 }
 
-function Home( {userName} ) {
+function Home({ userName }) {
   const navigate = useNavigate();
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-blue-50 to-white flex flex-col items-center justify-center text-center p-6 animate-fade-in">
@@ -109,7 +142,7 @@ function Home( {userName} ) {
       </h1>
       {userName && (
         <p className="text-2xl text-blue-700 mb-4">Hello, {userName}!</p>
-        )}
+      )}
       <p className="text-xl text-gray-700 max-w-xl mb-8">
         Empowering inclusive skill-building — one step at a time.
       </p>
@@ -132,34 +165,34 @@ function Home( {userName} ) {
 }
 
 export default function App() {
-  const [userName, setUserNameState] = useState(getUserName());
+  const [userName, setUserNameState] = useState(getUserName() || "");
+  const [showNameModal, setShowNameModal] = useState(!getUserName());
 
   useEffect(() => {
     getUserId(); // Ensure user ID exists
-    if (!userName) {
-      // Prompt for name if not set
-      let name = "";
-      while (!name) {
-        name = window.prompt("Welcome! What's your name?");
-        if (name) {
-          setUserName(name);
-          setUserNameState(name);
-        }
-      }
-    }
   }, []);
+
+  const handleNameSubmit = (name) => {
+    saveUserName(name);
+    setUserNameState(name);
+    setShowNameModal(false);
+  };
+
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home userName={userName} />} />
-        <Route path="/chat" element={<Chat />} />
-        <Route path="/lessons" element={<Lessons />} />
-        <Route path="/lessons/roster" element={<RosterLesson />} />
-        <Route path="/lessons/roster-questions" element={<RosterQuestions />} />
-        <Route path="/lessons/email" element={<Email />} />
-        <Route path="/lessons/email-quiz" element={<EmailQuiz />} />
-        <Route path="/lessons/ask-for-help" element={<AskForHelp />} />
-      </Routes>
-    </Router>
+    <>
+      <NameModal open={showNameModal} onSubmit={handleNameSubmit} />
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home userName={userName} />} />
+          <Route path="/chat" element={<Chat />} />
+          <Route path="/lessons" element={<Lessons />} />
+          <Route path="/lessons/roster" element={<RosterLesson />} />
+          <Route path="/lessons/roster-questions" element={<RosterQuestions />} />
+          <Route path="/lessons/email" element={<Email />} />
+          <Route path="/lessons/email-quiz" element={<EmailQuiz />} />
+          <Route path="/lessons/ask-for-help" element={<AskForHelp />} />
+        </Routes>
+      </Router>
+    </>
   );
 }
