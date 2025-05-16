@@ -1,3 +1,4 @@
+backend/backend/creds/google-tts.json
 .env
 
 venv/
@@ -6,3 +7,7 @@ venv/
 
 __pycache__/
 *.py[cod]
+*.py[cod]
+*.pyc
+
+backend/backend/creds/google-tts.json
