@@ -63,10 +63,16 @@ def speak(request):
         return Response({'error': 'No text provided'}, status=400)
 
     # Path to your JSON key
+    # credentials = service_account.Credentials.from_service_account_file(
+    #     # os.path.join('backend', 'creds', 'google-tts.json'),
+    #     "/etc/secrets/google-tts.json"
+    #     scopes=["https://www.googleapis.com/auth/cloud-platform"]
+    # )
     credentials = service_account.Credentials.from_service_account_file(
-        os.path.join('backend', 'creds', 'google-tts.json'),
-        scopes=["https://www.googleapis.com/auth/cloud-platform"]
-    )
+    "/etc/secrets/google-tts.json",
+    scopes=["https://www.googleapis.com/auth/cloud-platform"]
+)
+
     credentials.refresh(GoogleRequest())
 
     headers = {
