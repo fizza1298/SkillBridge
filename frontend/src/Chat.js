@@ -31,6 +31,31 @@ export default function Chat() {
     setUtterance(null);
   };
 
+  const playVoice = async (text) => {
+    const BASE_URL = process.env.REACT_APP_API_BASE || "https://skillbridge-d7z9.onrender.com";
+  
+    try {
+      const res = await fetch(`${BASE_URL}/api/speak/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text })
+      });
+  
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("🛑 TTS fetch failed:", errorText);
+        return;
+      }
+  
+      const blob = await res.blob();
+      const audio = new Audio(URL.createObjectURL(blob));
+      audio.play();
+    } catch (err) {
+      console.error("🎤 Voice playback error:", err);
+    }
+  };
+  
+
   const askAI = async (prompt) => {
     setLoading(true);
   
@@ -63,7 +88,9 @@ export default function Chat() {
         setAnswer(reply);
       }
   
-      speak(reply);
+      //speak(reply);
+      
+      playVoice(reply);
     } catch (err) {
       console.error("❌ Fetch error:", err);
       setAnswer("Something went wrong while fetching from AI.");
@@ -72,42 +99,7 @@ export default function Chat() {
     setLoading(false);
   };
   
-//   const askAI = async (prompt) => {
-//     setLoading(true);
-  
-//     // Dynamically determine the mode
-//     const selectedMode = mode === "roleplay" && role ? "feedback" : "explain";
-//     console.log("🧠 Selected Mode:", selectedMode);
-//     try {
-//       const response = await fetch("https://skillbridge-d7z9.onrender.com/api/ask/", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({
-//           question: prompt,
-//           mode: selectedMode
-//         })
-//       });
-  
-//       const data = await response.json();
-//       const reply = data.answer || data.error || "No response";
-  
-//       if (selectedMode === "feedback") {
-//         setFeedback(reply);  // For roleplay
-//       } else {
-//         setAnswer(reply);    // For ask mode
-//       }
-  
-//       speak(reply);
-  
-//     } catch (err) {
-//       console.error("❌ Fetch error:", err);
-//       setAnswer("Something went wrong while fetching from AI.");
-//     }
-  
-//     setLoading(false);
-//   };
-  
-  
+
 
   const toggleListening = () => {
     if (!('webkitSpeechRecognition' in window)) {
