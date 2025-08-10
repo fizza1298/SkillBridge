@@ -1,17 +1,12 @@
-import os
-import traceback
-import requests
+import os, json, base64, re, traceback, requests
+from django.http import HttpResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from dotenv import load_dotenv
-from .models import QuizResult
-import re
-from google.auth.transport.requests import Request as GoogleRequest
 from google.oauth2 import service_account
-import base64
-import re
-import json
-from django.http import HttpResponse
+from google.auth.transport.requests import Request as GoogleRequest
+from .models import QuizResult
+
 
 load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
@@ -93,12 +88,11 @@ def speak(request):
             else "backend/creds/google-tts.json"
         )
 
-
-        credentials = service_account.Credentials.from_service_account_file(
-            creds_path,
-            scopes=["https://www.googleapis.com/auth/cloud-platform"]
-        )
+        print("🔊 Starting TTS…")
+        credentials = get_google_credentials()
+        credentials = credentials.with_scopes(["https://www.googleapis.com/auth/cloud-platform"])
         credentials.refresh(GoogleRequest())
+
 
         print("✅ Credentials loaded and refreshed.")
 
@@ -140,5 +134,31 @@ def speak(request):
         print("❗ Exception in speak():", e)
         print(traceback.format_exc())
         return Response({'error': str(e)}, status=500)
+    
+
+
+def get_google_credentials():
+    # preferred: raw JSON from env (works great on Render)
+    raw_json = os.getenv("GOOGLE_TTS_JSON")
+    if raw_json:
+        return service_account.Credentials.from_service_account_info(json.loads(raw_json))
+
+    # local file: easy for localhost
+    path = os.getenv("GOOGLE_TTS_FILE")
+    if path and os.path.exists(path):
+        return service_account.Credentials.from_service_account_file(path)
+
+    # optional: base64 form
+    b64 = os.getenv("GOOGLE_TTS_JSON_B64")
+    if b64:
+        import base64
+        info = json.loads(base64.b64decode(b64).decode("utf-8"))
+        return service_account.Credentials.from_service_account_info(info)
+
+    raise FileNotFoundError("Provide GOOGLE_TTS_JSON, or GOOGLE_TTS_FILE, or GOOGLE_TTS_JSON_B64")
+
+# usage:
+credentials = get_google_credentials()
+
 
 

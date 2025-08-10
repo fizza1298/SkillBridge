@@ -1,4 +1,5 @@
-backend/backend/creds/google-tts.json
+backend/creds/*.json
+
 .env
 
 venv/

@@ -33,6 +33,8 @@ export default function Chat() {
 
   const playVoice = async (text) => {
     const BASE_URL = process.env.REACT_APP_API_BASE || "https://skillbridge-d7z9.onrender.com";
+    console.log("API base:", process.env.REACT_APP_API_BASE);
+
   
     try {
       const res = await fetch(`${BASE_URL}/api/speak/`, {
